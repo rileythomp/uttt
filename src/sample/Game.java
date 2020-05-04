@@ -1,17 +1,12 @@
 package sample;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
-import java.util.function.BinaryOperator;
 
 public class Game {
     public boolean p1Turn;
     public Board board;
-
     public boolean isWon;
 
     private GameView view;
@@ -66,11 +61,6 @@ public class Game {
             board.miniBoards.get(3*y + x).isTaken = true;
             board.miniBoards.get(3*y + x).ownedBy = (p1Turn ? "O" : "X");
         }
-//        for (int i = 0; i < 3; ++i) {
-//            for (int j = 0; j < 3; ++j) {
-//                board.miniBoards.get(3*y + x).cells.get(3*i + j).val = "R";
-//            }
-//        }
     }
 
 }

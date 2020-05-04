@@ -1,12 +1,9 @@
 package sample;
 
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.image.ImageView;
 
 import static javafx.scene.text.Font.font;
 

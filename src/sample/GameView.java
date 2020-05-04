@@ -33,6 +33,26 @@ public class GameView {
         gameStage = stage;
     }
 
+    private void handleGameWon(Game game) {
+        String turnText = "Player " + (!game.p1Turn ? "1" : "2") + " has won!";
+        Text turnMessage = Util.CreateTextNode(turnText, FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2, 50, 50 + CELL_LEN * BOARD_LEN + 66);
+        gameRoot.getChildren().add(turnMessage);
+
+        Text quitMessage = Util.CreateTextNode("q - Quit", FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2, 50, 50 + CELL_LEN * BOARD_LEN + 99);
+        gameRoot.getChildren().add(quitMessage);
+
+        Text playMessage = Util.CreateTextNode("p - Play again",FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2, 50, 50 + CELL_LEN * BOARD_LEN + 132);
+        gameRoot.getChildren().add(playMessage);
+
+        for (Object child : gameRoot.getChildren()) {
+            if (child instanceof Rectangle) {
+                ((Rectangle)(child)).setFill(Color.WHITESMOKE);
+            }
+        }
+
+        gameRoot.getChildren().add(game.board.winLine);
+    }
+
     public void displayGame(Game game) {
         gameRoot = new Pane();
 
@@ -41,37 +61,7 @@ public class GameView {
         displayBoardLines();
 
         if (game.isWon) {
-            String turnText = "Player " + (!game.p1Turn ? "1" : "2") + " has won!";
-            Text turnMessage = Util.CreateTextNode(
-                    turnText,
-                    FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2,
-                    50, 50 + CELL_LEN * BOARD_LEN + 33 + 33
-            );
-            gameRoot.getChildren().add(turnMessage);
-
-            String quitText = "q - Quit";
-            Text quitMessage = Util.CreateTextNode(
-                    quitText,
-                    FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2,
-                    50, 50 + CELL_LEN * BOARD_LEN + 33 + 33 + 33
-            );
-            gameRoot.getChildren().add(quitMessage);
-
-            String playText = "p - Play again";
-            Text playMessage = Util.CreateTextNode(
-                    playText,
-                    FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE/2,
-                    50, 50 + CELL_LEN * BOARD_LEN + 33 + 33 + 33 + 33
-            );
-            gameRoot.getChildren().add(playMessage);
-
-            for (Object child : gameRoot.getChildren()) {
-                if (child instanceof Rectangle) {
-                    ((Rectangle)(child)).setFill(Color.WHITESMOKE);
-                }
-            }
-
-            gameRoot.getChildren().add(game.board.winLine);
+            handleGameWon(game);
         }
         else {
             displayTurnMessage(game.p1Turn);
@@ -83,24 +73,28 @@ public class GameView {
             gameScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent keyEvent) {
-                    KeyCode pressed = keyEvent.getCode();
-                    if (pressed == KeyCode.Q) {
-                        System.exit(0);
-                    }
-                    else if (pressed == KeyCode.P) {
-                        Game game = null;
-                        try {
-                            game = new Game(gameStage);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        game.play();
-                    }
+                    takeUserKeyInput(keyEvent);
                 }
             });
         }
 
         gameStage.setScene(gameScene);
+    }
+
+    private void takeUserKeyInput(KeyEvent keyEvent) {
+        KeyCode pressed = keyEvent.getCode();
+        if (pressed == KeyCode.Q) {
+            System.exit(0);
+        }
+        else if (pressed == KeyCode.P) {
+            Game game = null;
+            try {
+                game = new Game(gameStage);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            game.play();
+        }
     }
 
     private void displayBoard(Game game) {
@@ -109,22 +103,14 @@ public class GameView {
             int y = i/3;
             int x = i%3;
             if (!miniBoard.isTaken) {
-                // add the rectanges with background color and click listener
-                // then add the cell char
                 int j = 0;
                 for (BoardCell boardCell : miniBoard.cells) {
                     int miniX = j%3;
                     int miniY = j/3;
-
-
-
                     Rectangle cellView = new Rectangle((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150*x + 50*miniX, 150*y + 50 + 50*miniY, 50, 50);
-
                     if (miniBoard.cells.get(j).canBeMovedTo && miniBoard.cells.get(j).val == "") {
                         cellView.setFill(Color.PALEGREEN);
                         cellView.opacityProperty().set(0.75);
-
-                        // ADD THE CELLVIEW CLICK EVENT LISTENER HERE
                         cellView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
@@ -138,13 +124,7 @@ public class GameView {
                     else {
                         cellView.setFill(Color.WHITESMOKE);
                     }
-
-
-                    Text letter = Util.CreateTextNode(
-                            miniBoard.cells.get(j).val,
-                            FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE,
-                            (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150*x + 50*miniX + 15, 150*y + 88 + 50*miniY
-                    );
+                    Text letter = Util.CreateTextNode(miniBoard.cells.get(j).val, FONT_NAME, FontWeight.NORMAL, Color.BLACK, FONT_SIZE, (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 50*(3*x+miniX)+15, 50*(3*y+miniY)+88);
                     gameRoot.getChildren().add(cellView);
                     gameRoot.getChildren().add(letter);
                     j++;
@@ -152,16 +132,11 @@ public class GameView {
                 displayMiniBoardLines(x, y);
             }
             else {
-                // add the rectangle with background color and click listener
                 Rectangle cellView = new Rectangle((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150*x, 150*y + 50, 150, 150);
                 cellView.setFill(Color.WHITESMOKE);
                 gameRoot.getChildren().add(cellView);
 
-                Text letter = Util.CreateTextNode(
-                        miniBoard.ownedBy,
-                        FONT_NAME, FontWeight.NORMAL, Color.BLACK, 5*FONT_SIZE,
-                        (SCREEN_WIDTH - CELL_LEN*BOARD_LEN)/2 + 150*x + 15, 180 + 150*y
-                );
+                Text letter = Util.CreateTextNode(miniBoard.ownedBy, FONT_NAME, FontWeight.NORMAL, Color.BLACK, 5*FONT_SIZE, (SCREEN_WIDTH - CELL_LEN*BOARD_LEN)/2 + 150*x + 15, 180 + 150*y);
                 gameRoot.getChildren().add(letter);
             }
 
@@ -171,19 +146,15 @@ public class GameView {
 
     private void displayMiniBoardLines(int x, int y) {
         Line firstVert = new Line((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 50 + 150*x, 50 + 150*y, (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 50 + 150*x, 200 + 150*y);
-        firstVert.setStroke(Color.BLACK);
         gameRoot.getChildren().add(firstVert);
 
         Line secondVert = new Line((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 100 + 150*x, 50 + 150*y, (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 100 + 150*x, 200 + 150*y);
-        secondVert.setStroke(Color.BLACK);
         gameRoot.getChildren().add(secondVert);
 
         Line firstHoriz = new Line((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150*x, 100 + 150*y, (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150 + 150*x, 100 + 150*y);
-        firstHoriz.setStroke(Color.BLACK);
         gameRoot.getChildren().add(firstHoriz);
 
         Line secondHoriz = new Line((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150*x, 150 + 150*y, (SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2 + 150 + 150*x, 150 + 150*y);
-        secondHoriz.setStroke(Color.BLACK);
         gameRoot.getChildren().add(secondHoriz);
     }
 
@@ -201,7 +172,6 @@ public class GameView {
         for (int i = 0; i <= BOARD_LEN; ++i) {
             if (i%3 == 0) {
                 Line line = new Line(((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2), CELL_LEN*i + 50, ((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2) + CELL_LEN*BOARD_LEN, 50 + CELL_LEN*i);
-                line.setStroke(Color.BLACK);
                 line.setStrokeWidth(3);
                 gameRoot.getChildren().add(line);
             }
@@ -210,7 +180,6 @@ public class GameView {
         for (int i = 0; i <= BOARD_LEN; ++i) {
             if (i%3 == 0) {
                 Line line = new Line(((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2) + CELL_LEN*i, 50, ((SCREEN_WIDTH - BOARD_LEN*CELL_LEN)/2) + CELL_LEN*i, 50 + CELL_LEN*BOARD_LEN);
-                line.setStroke(Color.BLACK);
                 line.setStrokeWidth(3);
                 gameRoot.getChildren().add(line);
             }
