@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -14,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 
 public class GameView {
     private Stage gameStage;
@@ -116,7 +118,33 @@ public class GameView {
                             public void handle(MouseEvent mouseEvent) {
                                 if (!game.isWon) {
                                     game.updateGame(x, y, miniX, miniY);
+
+//                                    long startTime = new Date().getTime();
+//                                    long curTime = new Date().getTime();
+//                                    while ((int)(curTime - startTime)/1000 < 4) {
+//                                        curTime = new Date().getTime();
+//                                    }
+//                                    cellView.setFill(Color.PURPLE);
+                                    
                                     displayGame(game);
+//                                    int mbIndex = 0;
+//                                    boolean broken = false;
+//                                    for (MiniBoard mb : game.board.miniBoards) {
+//                                        int cellIndex = 0;
+//                                        for (BoardCell cell : mb.cells) {
+//                                            if (cell.val == "") {
+//                                                game.board.miniBoards.get(mbIndex).cells.get(cellIndex).val = "R";
+//                                                broken = true;
+//                                                break;
+//                                            }
+//                                            cellIndex++;
+//                                        }
+//                                        if (broken) {
+//                                            break;
+//                                        }
+//                                        mbIndex++;
+//                                    }
+//                                    displayGame(game);
                                 }
                             }
                         });
